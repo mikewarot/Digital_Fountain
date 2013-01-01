@@ -1,15 +1,15 @@
 import random;
 
-K = 500    # how many blocks makes the whole set
-M = 7      # how many blocks do we Mix to get an output block? (should be ODD)
+K = 100    # how many blocks makes the whole set
+M = 17     # how many blocks do we Mix to get an output block? (should be ODD)
 Extras = 5 # how many extra samples?
 
 def sampleset(x): # return M samples based on random seed x from K elements
 	random.seed(x)
-	return random.sample(xrange(K),M)
+	return set(random.sample(xrange(K),M))
   
 x = map(sampleset,range(K+Extras)) 
-y = map(sorted,x)
+y = x
 z = sorted(y)
 
 def expand(a): # expand a sample list into a boolean array of K elements
@@ -25,17 +25,17 @@ xor = lambda arg1, arg2 : arg1 ^ arg2
 # listdiff = lambda arg1, arg2 : list(set(arg1)^set(arg2))
 listdiff = lambda arg1, arg2 : sorted(list(set(arg1)^set(arg2)))
 
-bracketn = lambda arg1 : [ arg1 ] # useful for generating lists of lists
+bracketn = lambda arg1 : set([ arg1 ]) # useful for generating lists of lists
 
-source = map(bracketn,xrange(K+Extras)) # [[0], [1], [2]...
+source = map(bracketn,xrange(K+Extras)) # [Set([0]), Set([1]), Set([2])...
 
 def swap2(a,b) : # used to swap rows in the Y table, to get a leading value
         source[a],source[b] = source[b],source[a]
         y[a],y[b] = y[b],y[a]
         
 def reduce2(a,b) : # used to factor out row b from row a
-	source[a] = listdiff(source[a],source[b])
-	y[a] = listdiff(y[a],y[b])
+	source[a] = source[a]^source[b]
+	y[a] = y[a]^y[b]
 
 def hasit(a) : # return a list of all entries in Y containing a
 	foundlist = list()
@@ -72,7 +72,7 @@ def grinddown(a) : # reduce out all entries less than a
 
 
 
-map(grindup,range(K))            # forward elimination in the matrix
-map(grinddown,range(K-1,0,-1))   # factoring out single entries
+# map(grindup,range(K))            # forward elimination in the matrix
+# map(grinddown,range(K-1,0,-1))   # factoring out single entries
 
 
